@@ -1,0 +1,22 @@
+This utility for the Motorola Photon Q sets the RF NV item 8322 to the value 0,
+which allows the device to be used on GSM carriers in the US.
+
+Usage:
+
+$ make
+/build/Android/cm-11.0/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.7/bin/arm-linux-androideabi-gcc --sysroot /build/Android/cm-11.0/prebuilts/ndk/9/platforms/android-10/arch-arm/ -Wall    xt897-fix-usa.c   -o xt897-fix-usa
+
+Now copy xt897-fix-usa to the phone and run it as root:
+
+root@asanti_c:/data/local/tmp # ./xt897-fix-usa
+Setting logging_mode to internal...
+Opened diag...
+Getting value of NV-item 8322...
+GSM outside USA only: 1
+Setting value of NV-item 8322 to 0...
+Getting value of NV-item 8322...
+GSM outside USA only: 0
+Setting logging_mode to usb...
+
+You can get a precompiled binary from:
+http://bork.cs.fau.de/~michael/photonq/xt897-fix-usa
