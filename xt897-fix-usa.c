@@ -63,7 +63,11 @@ int diag_rw(int fd, unsigned char *req, int req_len, unsigned char *resp, int *r
 	int ret;
 	int len;
 
-	ret = write(fd, req, req_len);
+	do {
+		errno = 0;
+		ret = write(fd, req, req_len);
+	} while ((ret != req_len) && (errno == EAGAIN));
+
 	if (ret != req_len) {
 		perror("write");
 		return 0;
