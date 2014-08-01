@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 		exit(EXIT_SUCCESS);
 	}
 
-	printf("Setting value of NV-item 8322 to 0...\n");
+	printf("Setting value of NV-item 8322 to %d...\n", nv_set[3]);
 
 	len = sizeof(data);
 	if (!diag_rw(fd, nv_set, sizeof(nv_set), data, &len)) {
