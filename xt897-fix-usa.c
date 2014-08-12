@@ -93,6 +93,21 @@ int main(int argc, char **argv)
 	int len;
 	int ret;
 
+	if (argc > 1) {
+		do {
+			if (argc == 2) {
+				if (!strcmp(argv[1], "lock")) {
+					printf("Locking USA GSM!\n");
+					nv_set[3] = 0x01;
+					break;
+				}
+			}
+
+			fprintf(stderr, "Syntax: %s [lock]\n", argv[0]);
+			exit(EXIT_FAILURE);
+		} while(0);
+	}
+
 	if (!logging_mode(1)) {
 		exit(EXIT_FAILURE);
 	}
@@ -133,7 +148,7 @@ int main(int argc, char **argv)
 	}
 
 	printf("GSM outside USA only: %d\n", data[3]);
-	if (data[3] == 0x00) {
+	if (data[3] == nv_set[3]) {
 		printf("No need to change anything!\n");
 
 		if (!logging_mode(0)) {
@@ -163,7 +178,7 @@ int main(int argc, char **argv)
 	}
 
 	printf("GSM outside USA only: %d\n", data[3]);
-	if (data[3] != 0x00) {
+	if (data[3] != nv_set[3]) {
 		printf("Couldn't change GSM-outside-USA-only-bit!\n");
 		goto err;
 	}
