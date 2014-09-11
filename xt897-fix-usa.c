@@ -150,37 +150,31 @@ int main(int argc, char **argv)
 	printf("GSM outside USA only: %d\n", data[3]);
 	if (data[3] == nv_set[3]) {
 		printf("No need to change anything!\n");
+	} else {
+		printf("Setting value of NV-item 8322 to %d...\n", nv_set[3]);
 
-		if (!logging_mode(0)) {
-			exit(EXIT_FAILURE);
+		len = sizeof(data);
+		if (!diag_rw(fd, nv_set, sizeof(nv_set), data, &len)) {
+			goto err;
 		}
 
-		exit(EXIT_SUCCESS);
-	}
+		printf("Getting value of NV-item 8322...\n");
 
-	printf("Setting value of NV-item 8322 to %d...\n", nv_set[3]);
+		len = sizeof(data);
+		if (!diag_rw(fd, nv_get, sizeof(nv_get), data, &len)) {
+			goto err;
+		}
 
-	len = sizeof(data);
-	if (!diag_rw(fd, nv_set, sizeof(nv_set), data, &len)) {
-		goto err;
-	}
+		if (len != sizeof(nv_get)) {
+			printf("Wrong amount of data read %d != %d!\n", len, sizeof(nv_get));
+			goto err;
+		}
 
-	printf("Getting value of NV-item 8322...\n");
-
-	len = sizeof(data);
-	if (!diag_rw(fd, nv_get, sizeof(nv_get), data, &len)) {
-		goto err;
-	}
-
-	if (len != sizeof(nv_get)) {
-		printf("Wrong amount of data read %d != %d!\n", len, sizeof(nv_get));
-		goto err;
-	}
-
-	printf("GSM outside USA only: %d\n", data[3]);
-	if (data[3] != nv_set[3]) {
-		printf("Couldn't change GSM-outside-USA-only-bit!\n");
-		goto err;
+		printf("GSM outside USA only: %d\n", data[3]);
+		if (data[3] != nv_set[3]) {
+			printf("Couldn't change GSM-outside-USA-only-bit!\n");
+			goto err;
+		}
 	}
 
 	close(fd);
