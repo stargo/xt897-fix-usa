@@ -58,49 +58,63 @@ int logging_mode(int internal)
 	return 1;
 }
 
-void show_bands(unsigned long long bands)
+void show_bands(uint64_t bands)
 {
 	printf("Bands enabled by 0x%016llx (%llu):\n", bands, bands);
 
-	if (bands & ((unsigned long long)1 <<  0)) printf("00: CDMA-1: BC 0, A-System\n");
-	if (bands & ((unsigned long long)1 <<  1)) printf("01: CDMA-1: BC 0, B-System\n");
-	if (bands & ((unsigned long long)1 <<  2)) printf("02: CDMA-1: BC 1, all blocks\n");
-	if (bands & ((unsigned long long)1 <<  3)) printf("03: CDMA-1: BC 2, place holder\n");
-	if (bands & ((unsigned long long)1 <<  4)) printf("04: CDMA-1: BC 3, A-System\n");
-	if (bands & ((unsigned long long)1 <<  5)) printf("05: CDMA-1: BC 4, all blocks\n");
-	if (bands & ((unsigned long long)1 <<  6)) printf("06: CDMA-1: BC 5, all blocks\n");
-	if (bands & ((unsigned long long)1 <<  7)) printf("07: GSM: DCS 1800\n");
-	if (bands & ((unsigned long long)1 <<  8)) printf("08: GSM: Extended GSM (E-GSM)\n");
-	if (bands & ((unsigned long long)1 <<  9)) printf("09: GSM: Primary GSM (P-GSM)\n");
-	if (bands & ((unsigned long long)1 << 10)) printf("10: CDMA-1: BC 6\n");
-	if (bands & ((unsigned long long)1 << 11)) printf("11: CDMA-1: BC 7\n");
-	if (bands & ((unsigned long long)1 << 12)) printf("12: CDMA-1: BC 8\n");
-	if (bands & ((unsigned long long)1 << 13)) printf("13: CDMA-1: BC 9\n");
-	if (bands & ((unsigned long long)1 << 14)) printf("14: CDMA-2: BC 10\n");
-	if (bands & ((unsigned long long)1 << 15)) printf("15: CDMA-2: BC 11\n");
-	if (bands & ((unsigned long long)1 << 16)) printf("16: GSM: GSM 450\n");
-	if (bands & ((unsigned long long)1 << 17)) printf("17: GSM: GSM 480\n");
-	if (bands & ((unsigned long long)1 << 18)) printf("18: GSM: GSM 750\n");
-	if (bands & ((unsigned long long)1 << 19)) printf("19: GSM: GSM 850\n");
-	if (bands & ((unsigned long long)1 << 20)) printf("20: GSM: Railway GSM 900\n");
-	if (bands & ((unsigned long long)1 << 21)) printf("21: GSM: PCS 1900\n");
-	if (bands & ((unsigned long long)1 << 22)) printf("22: WCDMA: I   - Europe Japan China IMT 2100\n");
-	if (bands & ((unsigned long long)1 << 23)) printf("23: WCDMA: II  - US PCS 1900\n");
-	if (bands & ((unsigned long long)1 << 24)) printf("24: WCDMA: III - Europe China DCS 1800\n");
-	if (bands & ((unsigned long long)1 << 25)) printf("25: WCDMA: IV  - US 1700\n");
-	if (bands & ((unsigned long long)1 << 26)) printf("26: WCDMA: V   - US 850\n");
-	if (bands & ((unsigned long long)1 << 27)) printf("27: WCDMA: VI  - Japan 800\n");
-	if (bands & ((unsigned long long)1 << 28)) printf("28: CDMA-2: BC 12\n");
-	if (bands & ((unsigned long long)1 << 29)) printf("29: CDMA-2: BC 14\n");
-	if (bands & ((unsigned long long)1 << 31)) printf("31: CDMA-2: BC 15\n");
-	if (bands & ((unsigned long long)1 << 48)) printf("48: WCDMA: VII - Europe 2600\n");
-	if (bands & ((unsigned long long)1 << 49)) printf("49: WCDMA: VIII- Europe Japan 900\n");
-	if (bands & ((unsigned long long)1 << 50)) printf("50: WCDMA: IX  - Japan 1700\n");
-	if (bands & ((unsigned long long)1 << 56)) printf("56: CDMA-2: BC 16\n");
-	if (bands & ((unsigned long long)1 << 57)) printf("57: CDMA-2: BC 17\n");
-	if (bands & ((unsigned long long)1 << 58)) printf("58: CDMA-2: BC 18\n");
-	if (bands & ((unsigned long long)1 << 59)) printf("59: CDMA-2: BC 19\n");
-	if (bands & ((unsigned long long)1 << 61)) printf("50: WCDMA: XI  - 1500\n");
+	if (bands & ((uint64_t)1 <<  0)) printf("00: CDMA-1: BC 0, A-System\n");
+	if (bands & ((uint64_t)1 <<  1)) printf("01: CDMA-1: BC 0, B-System\n");
+	if (bands & ((uint64_t)1 <<  2)) printf("02: CDMA-1: BC 1, all blocks\n");
+	if (bands & ((uint64_t)1 <<  3)) printf("03: CDMA-1: BC 2, place holder\n");
+	if (bands & ((uint64_t)1 <<  4)) printf("04: CDMA-1: BC 3, A-System\n");
+	if (bands & ((uint64_t)1 <<  5)) printf("05: CDMA-1: BC 4, all blocks\n");
+	if (bands & ((uint64_t)1 <<  6)) printf("06: CDMA-1: BC 5, all blocks\n");
+	if (bands & ((uint64_t)1 <<  7)) printf("07: GSM: DCS 1800\n");
+	if (bands & ((uint64_t)1 <<  8)) printf("08: GSM: Extended GSM (E-GSM)\n");
+	if (bands & ((uint64_t)1 <<  9)) printf("09: GSM: Primary GSM (P-GSM)\n");
+	if (bands & ((uint64_t)1 << 10)) printf("10: CDMA-1: BC 6\n");
+	if (bands & ((uint64_t)1 << 11)) printf("11: CDMA-1: BC 7\n");
+	if (bands & ((uint64_t)1 << 12)) printf("12: CDMA-1: BC 8\n");
+	if (bands & ((uint64_t)1 << 13)) printf("13: CDMA-1: BC 9\n");
+	if (bands & ((uint64_t)1 << 14)) printf("14: CDMA-2: BC 10\n");
+	if (bands & ((uint64_t)1 << 15)) printf("15: CDMA-2: BC 11\n");
+	if (bands & ((uint64_t)1 << 16)) printf("16: GSM: GSM 450\n");
+	if (bands & ((uint64_t)1 << 17)) printf("17: GSM: GSM 480\n");
+	if (bands & ((uint64_t)1 << 18)) printf("18: GSM: GSM 750\n");
+	if (bands & ((uint64_t)1 << 19)) printf("19: GSM: GSM 850\n");
+	if (bands & ((uint64_t)1 << 20)) printf("20: GSM: Railway GSM 900\n");
+	if (bands & ((uint64_t)1 << 21)) printf("21: GSM: PCS 1900\n");
+	if (bands & ((uint64_t)1 << 22)) printf("22: WCDMA: I   - Europe Japan China IMT 2100\n");
+	if (bands & ((uint64_t)1 << 23)) printf("23: WCDMA: II  - US PCS 1900\n");
+	if (bands & ((uint64_t)1 << 24)) printf("24: WCDMA: III - Europe China DCS 1800\n");
+	if (bands & ((uint64_t)1 << 25)) printf("25: WCDMA: IV  - US 1700\n");
+	if (bands & ((uint64_t)1 << 26)) printf("26: WCDMA: V   - US 850\n");
+	if (bands & ((uint64_t)1 << 27)) printf("27: WCDMA: VI  - Japan 800\n");
+	if (bands & ((uint64_t)1 << 28)) printf("28: CDMA-2: BC 12\n");
+	if (bands & ((uint64_t)1 << 29)) printf("29: CDMA-2: BC 14\n");
+	if (bands & ((uint64_t)1 << 31)) printf("31: CDMA-2: BC 15\n");
+	if (bands & ((uint64_t)1 << 48)) printf("48: WCDMA: VII - Europe 2600\n");
+	if (bands & ((uint64_t)1 << 49)) printf("49: WCDMA: VIII- Europe Japan 900\n");
+	if (bands & ((uint64_t)1 << 50)) printf("50: WCDMA: IX  - Japan 1700\n");
+	if (bands & ((uint64_t)1 << 56)) printf("56: CDMA-2: BC 16\n");
+	if (bands & ((uint64_t)1 << 57)) printf("57: CDMA-2: BC 17\n");
+	if (bands & ((uint64_t)1 << 58)) printf("58: CDMA-2: BC 18\n");
+	if (bands & ((uint64_t)1 << 59)) printf("59: CDMA-2: BC 19\n");
+	if (bands & ((uint64_t)1 << 61)) printf("50: WCDMA: XI  - 1500\n");
+
+	printf("\n");
+}
+
+void show_lte_bands(uint32_t bands)
+{
+	printf("LTE Bands enabled by 0x%08x (%u):\n", bands, bands);
+
+	/* Guessed from defaults of different devices */
+	if (bands & ((uint32_t)1 << 0) <<  0) printf("1900 MHz\n");
+	if (bands & ((uint32_t)1 << 3) <<  8) printf("800 MHz\n");
+	if (bands & ((uint32_t)1 << 4) << 16) printf("700 MHz\n");
+	if (bands & ((uint32_t)1 << 2) << 24) printf("1800 or 2600 MHz\n");
+	if (bands & ((uint32_t)1 << 6) << 24) printf("1800 or 2600 MHz\n");
 
 	printf("\n");
 }
@@ -139,8 +153,10 @@ int main(int argc, char **argv)
 	int fd;
 	int len;
 	int ret;
-	unsigned long long bands;
-	unsigned long long newbands;
+	uint64_t bands;
+	uint64_t new_bands;
+	uint32_t lte_bands;
+	uint32_t new_lte_bands;
 	int i;
 
 	if (argc > 1) {
@@ -255,28 +271,93 @@ int main(int argc, char **argv)
 	show_bands(bands);
 
 #if 0
-	newbands = bands;
-	//newbands = 82329991; /* default on XT897 */
-	newbands |= ((unsigned long long)1 << 24); /* WCDMA 1800 */
-	newbands |= ((unsigned long long)1 << 25); /* WCDMA 1700 */
-	newbands |= ((unsigned long long)1 << 48); /* Europe 2600 */
-	newbands |= ((unsigned long long)1 << 49); /* Europe Japan 900 */
+	new_bands = bands;
+	new_bands |= 82329991; /* default on XT897 */
+	new_bands |= 562950035735424; /* default on XT925 */
+	//new_bands |= ((uint64_t)1 << 9); /* P-GSM */
+	//new_bands |= ((uint64_t)1 << 49); /* Europe Japan 900 */
+	new_bands |= ((uint64_t)1 << 24); /* WCDMA 1800 */
+	new_bands |= ((uint64_t)1 << 25); /* WCDMA 1700 */
+	//new_bands |= ((uint64_t)1 << 48); /* Europe 2600 */
 
-	if (bands == newbands) {
+	if (bands == new_bands) {
 		printf("No need to change anything!\n");
 	} else {
-		printf("Setting value of NV-item 1877 to 0x%016llx (%llu)...\n", newbands, newbands);
-		show_bands(newbands);
+		printf("Setting value of NV-item 1877 to 0x%016llx (%llu)...\n", new_bands, new_bands);
+		show_bands(new_bands);
 
-		nv_set[1] = 0x55;
-		nv_set[2] = 0x07;
+		memcpy(data, nv_set, sizeof(nv_set));
+
+		data[1] = 0x55;
+		data[2] = 0x07;
 
 		for (i = 7; i >= 0; i--) {
-			nv_set[3+i] = (newbands >> (i * 8)) & 0xff;
+			data[3+i] = (new_bands >> (i * 8)) & 0xff;
 		}
 
 		len = sizeof(data);
-		if (!diag_rw(fd, nv_set, sizeof(nv_set), data, &len)) {
+		if (!diag_rw(fd, data, sizeof(nv_set), data, &len)) {
+			goto err;
+		}
+	}
+	printf("\n");
+#endif
+
+	/* LTE */
+	printf("\n");
+	printf("Getting value of NV-item 6828...\n");
+
+	nv_get[1] = 0xAC;
+	nv_get[2] = 0x1A;
+
+	len = sizeof(data);
+	if (!diag_rw(fd, nv_get, sizeof(nv_get), data, &len)) {
+		goto err;
+	}
+
+	if (len != sizeof(nv_get)) {
+		printf("Wrong amount of data read %d != %d!\n", len, sizeof(nv_get));
+		goto err;
+	}
+
+	lte_bands = 0;
+	for (i = 0; i < 4; i++) {
+		lte_bands <<= 8;
+		lte_bands |= data[3+i];
+	}
+
+	show_lte_bands(lte_bands);
+
+	printf("\n");
+
+#if 0
+	new_lte_bands = lte_bands;
+	new_lte_bands |= 0x01; /* default on XT897, 1900MHz */
+	new_lte_bands |= 0x100000; /* default on XT907, XT926, 700MHz? */
+	new_lte_bands |= 0x44000800; /* default on XT925 */
+	//new_lte_bands |= 0x44000000; /* default on XT905 */
+
+	if (lte_bands == new_lte_bands) {
+		printf("No need to change anything!\n");
+	} else {
+		printf("Setting value of NV-item 6828 to 0x%06x (%u)...\n", new_lte_bands, new_lte_bands);
+		show_lte_bands(new_lte_bands);
+
+		memcpy(data, nv_set, sizeof(nv_set));
+
+		data[1] = 0xAC;
+		data[2] = 0x1A;
+
+		for (i = 0; i < 4; i++) {
+			data[3+i] = (new_lte_bands >> ((3 - i) * 8)) & 0xff;
+		}
+
+		for (i = 0; i < 32; i++)
+			printf("%02x ", data[i]);
+		printf("\n");
+
+		len = sizeof(data);
+		if (!diag_rw(fd, data, sizeof(nv_set), data, &len)) {
 			goto err;
 		}
 	}
