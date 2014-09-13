@@ -29,6 +29,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+enum bands {
+	BANDS_NO_CHANGE,
+	BANDS_XT897,
+	BANDS_XT925,
+	BANDS_ALL,
+};
+
 int logging_mode(int internal)
 {
 	char *mode;
@@ -154,9 +161,12 @@ int main(int argc, char **argv)
 	int len;
 	int ret;
 	uint64_t bands;
+	int change_bands = BANDS_NO_CHANGE;
 	uint64_t new_bands;
 	uint32_t lte_bands;
+#if 0
 	uint32_t new_lte_bands;
+#endif
 	int i;
 
 	if (argc > 1) {
@@ -166,10 +176,19 @@ int main(int argc, char **argv)
 					printf("Locking USA GSM!\n");
 					nv_set[3] = 0x01;
 					break;
+				} else if (!strcmp(argv[1], "all_bands")) {
+					change_bands = BANDS_ALL;
+					break;
+				} else if (!strcmp(argv[1], "xt897_bands")) {
+					change_bands = BANDS_XT897;
+					break;
+				} else if (!strcmp(argv[1], "xt925_bands")) {
+					change_bands = BANDS_XT897;
+					break;
 				}
 			}
 
-			fprintf(stderr, "Syntax: %s [lock]\n", argv[0]);
+			fprintf(stderr, "Syntax: %s [lock|all_bands|xt897_bands|xt925_bands]\n", argv[0]);
 			exit(EXIT_FAILURE);
 		} while(0);
 	}
@@ -270,38 +289,52 @@ int main(int argc, char **argv)
 
 	show_bands(bands);
 
-#if 0
-	new_bands = bands;
-	new_bands |= 82329991; /* default on XT897 */
-	new_bands |= 562950035735424; /* default on XT925 */
-	//new_bands |= ((uint64_t)1 << 9); /* P-GSM */
-	//new_bands |= ((uint64_t)1 << 49); /* Europe Japan 900 */
-	new_bands |= ((uint64_t)1 << 24); /* WCDMA 1800 */
-	new_bands |= ((uint64_t)1 << 25); /* WCDMA 1700 */
-	//new_bands |= ((uint64_t)1 << 48); /* Europe 2600 */
+	if (change_bands != BANDS_NO_CHANGE) {
+		new_bands = bands;
 
-	if (bands == new_bands) {
-		printf("No need to change anything!\n");
-	} else {
-		printf("Setting value of NV-item 1877 to 0x%016llx (%llu)...\n", new_bands, new_bands);
-		show_bands(new_bands);
-
-		memcpy(data, nv_set, sizeof(nv_set));
-
-		data[1] = 0x55;
-		data[2] = 0x07;
-
-		for (i = 7; i >= 0; i--) {
-			data[3+i] = (new_bands >> (i * 8)) & 0xff;
+		switch (change_bands) {
+			case BANDS_ALL:
+				printf("Enabling additional GSM/WCDMA bands:\n");
+				new_bands |= 82329991; /* default on XT897 */
+				new_bands |= 562950035735424; /* default on XT925 */
+				//new_bands |= ((uint64_t)1 << 9); /* P-GSM */
+				//new_bands |= ((uint64_t)1 << 49); /* Europe Japan 900 */
+				new_bands |= ((uint64_t)1 << 24); /* WCDMA 1800 */
+				new_bands |= ((uint64_t)1 << 25); /* WCDMA 1700 */
+				//new_bands |= ((uint64_t)1 << 48); /* Europe 2600 */
+				break;
+			case BANDS_XT897:
+				printf("Resetting to default Photon Q bands:\n");
+				new_bands = 82329991; /* default on XT897 */
+				break;
+			case BANDS_XT925:
+				printf("Resetting to default XT925 bands:\n");
+				new_bands = 562950035735424; /* default on XT925 */
+				break;
 		}
 
-		len = sizeof(data);
-		if (!diag_rw(fd, data, sizeof(nv_set), data, &len)) {
-			goto err;
+		if (bands == new_bands) {
+			printf("No need to change anything!\n");
+		} else {
+			printf("Setting value of NV-item 1877 to 0x%016llx (%llu)...\n", new_bands, new_bands);
+			show_bands(new_bands);
+
+			memcpy(data, nv_set, sizeof(nv_set));
+
+			data[1] = 0x55;
+			data[2] = 0x07;
+
+			for (i = 7; i >= 0; i--) {
+				data[3+i] = (new_bands >> (i * 8)) & 0xff;
+			}
+
+			len = sizeof(data);
+			if (!diag_rw(fd, data, sizeof(nv_set), data, &len)) {
+				goto err;
+			}
 		}
+		printf("\n");
 	}
-	printf("\n");
-#endif
 
 	/* LTE */
 	printf("\n");
