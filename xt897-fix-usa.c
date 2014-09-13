@@ -330,11 +330,16 @@ int main(int argc, char **argv)
 
 	printf("\n");
 
+	/* This also needs a modified/removed
+	 * /nv/item_files/modem/mmode/lte_bandpref in EFS.
+	 * After this the modem will crash as soon as it tries to
+	 * switch to a newly enabled frequency
+	 */
 #if 0
 	new_lte_bands = lte_bands;
 	new_lte_bands |= 0x01; /* default on XT897, 1900MHz */
-	new_lte_bands |= 0x100000; /* default on XT907, XT926, 700MHz? */
-	new_lte_bands |= 0x44000800; /* default on XT925 */
+	//new_lte_bands |= 0x100000; /* default on XT907, XT926, 700MHz? */
+	//new_lte_bands |= 0x44000800; /* default on XT925 */
 	//new_lte_bands |= 0x44000000; /* default on XT905 */
 
 	if (lte_bands == new_lte_bands) {
@@ -351,10 +356,6 @@ int main(int argc, char **argv)
 		for (i = 0; i < 4; i++) {
 			data[3+i] = (new_lte_bands >> ((3 - i) * 8)) & 0xff;
 		}
-
-		for (i = 0; i < 32; i++)
-			printf("%02x ", data[i]);
-		printf("\n");
 
 		len = sizeof(data);
 		if (!diag_rw(fd, data, sizeof(nv_set), data, &len)) {
