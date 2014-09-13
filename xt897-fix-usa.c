@@ -216,7 +216,7 @@ int main(int argc, char **argv)
 					change_bands = BANDS_XT897;
 					break;
 				} else if (!strcmp(argv[1], "xt925_bands")) {
-					change_bands = BANDS_XT897;
+					change_bands = BANDS_XT925;
 					break;
 				}
 			}
