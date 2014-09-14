@@ -89,7 +89,7 @@ int logging_mode(int internal)
 
 void show_bands(uint64_t bands)
 {
-	printf("Bands enabled by 0x%016llx (%llu):\n", bands, bands);
+	printf("Bands enabled by 0x%016llx:\n", bands);
 
 	if (bands & ((uint64_t)1 <<  0)) printf("00: CDMA-1: BC 0, A-System\n");
 	if (bands & ((uint64_t)1 <<  1)) printf("01: CDMA-1: BC 0, B-System\n");
@@ -136,7 +136,7 @@ void show_bands(uint64_t bands)
 
 void show_lte_bands(uint32_t bands)
 {
-	printf("LTE Bands enabled by 0x%08x (%u):\n", bands, bands);
+	printf("LTE Bands enabled by 0x%08x:\n", bands);
 
 	/* Guessed from defaults of different devices */
 	if (bands & ((uint32_t)1 << 0) <<  0) printf("1900 MHz\n");
