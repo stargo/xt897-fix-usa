@@ -377,7 +377,7 @@ int main(int argc, char **argv)
 
 		switch (change_bands) {
 			case BANDS_EXTRA:
-				printf("Enabling WCDMA 1700/1800 and ");
+				printf("Enabling WCDMA 1800 and ");
 				new_bands |= ((uint64_t)1 << 24); /* WCDMA 1800 */
 				//new_bands |= ((uint64_t)1 << 25); /* WCDMA 1700 */
 				//new_bands |= ((uint64_t)1 << 48); /* Europe 2600 */
