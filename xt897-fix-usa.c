@@ -48,6 +48,7 @@
 enum bands {
 	BANDS_NO_CHANGE,
 	BANDS_XT897,
+	BANDS_XT897_P_GSM,
 	BANDS_XT901,
 	BANDS_XT905,
 	BANDS_XT907,
@@ -264,6 +265,9 @@ int main(int argc, char **argv)
 				} else if (!strcmp(argv[1], "xt897_bands")) {
 					change_bands = BANDS_XT897;
 					break;
+				} else if (!strcmp(argv[1], "xt897_p_gsm_bands")) {
+					change_bands = BANDS_XT897_P_GSM;
+					break;
 				} else if (!strcmp(argv[1], "xt901_bands")) {
 					change_bands = BANDS_XT901;
 					break;
@@ -288,6 +292,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, "Syntax: %s [lock|bands]\n\n", argv[0]);
 			fprintf(stderr, "Possible value for bands:\n");
 			fprintf(stderr, "\txt897_bands\tdefault bands of XT897\n");
+			fprintf(stderr, "\txt897_p_gsm_bands\tXT897 with P_GSM\n");
 			fprintf(stderr, "\txt901_bands\tdefault bands of XT901\n");
 			fprintf(stderr, "\txt905_bands\tdefault bands of XT905\n");
 			fprintf(stderr, "\txt907_bands\tdefault bands of XT907\n");
@@ -418,6 +423,11 @@ int main(int argc, char **argv)
 			case BANDS_XT897:
 				printf("Resetting to default Photon Q bands:\n");
 				new_bands = DEFAULT_BANDS_XT897; /* default on XT897 */
+				break;
+			case BANDS_XT897_P_GSM:
+				printf("Setting to default Photon Q bands and primary GSM:\n");
+				new_bands = DEFAULT_BANDS_XT897; /* default on XT897 */
+				new_bands |= (1 << 9);
 				break;
 			case BANDS_XT901:
 				printf("Resetting to default Electrify M bands:\n");
