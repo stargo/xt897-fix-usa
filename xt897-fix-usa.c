@@ -48,7 +48,6 @@
 enum bands {
 	BANDS_NO_CHANGE,
 	BANDS_XT897,
-	BANDS_XT897_P_GSM,
 	BANDS_XT901,
 	BANDS_XT905,
 	BANDS_XT907,
@@ -56,7 +55,10 @@ enum bands {
 	BANDS_XT926,
 	BANDS_MB886,
 	BANDS_ALL_PHONES,
-	BANDS_EXTRA,
+	BANDS_ADD_P_GSM,
+	BANDS_ADD_WCDMA_900,
+	BANDS_ADD_WCDMA_1700,
+	BANDS_ADD_WCDMA_1800,
 };
 
 int logging_mode(int internal)
@@ -259,14 +261,8 @@ int main(int argc, char **argv)
 				} else if (!strcmp(argv[1], "all_bands")) {
 					change_bands = BANDS_ALL_PHONES;
 					break;
-				} else if (!strcmp(argv[1], "extra_bands")) {
-					change_bands = BANDS_EXTRA;
-					break;
 				} else if (!strcmp(argv[1], "xt897_bands")) {
 					change_bands = BANDS_XT897;
-					break;
-				} else if (!strcmp(argv[1], "xt897_p_gsm_bands")) {
-					change_bands = BANDS_XT897_P_GSM;
 					break;
 				} else if (!strcmp(argv[1], "xt901_bands")) {
 					change_bands = BANDS_XT901;
@@ -286,13 +282,24 @@ int main(int argc, char **argv)
 				} else if (!strcmp(argv[1], "mb886_bands")) {
 					change_bands = BANDS_MB886;
 					break;
+				} else if (!strcmp(argv[1], "add_p_gsm")) {
+					change_bands = BANDS_ADD_P_GSM;
+					break;
+				} else if (!strcmp(argv[1], "add_wcdma_900")) {
+					change_bands = BANDS_ADD_WCDMA_900;
+					break;
+				} else if (!strcmp(argv[1], "add_wcdma_1700")) {
+					change_bands = BANDS_ADD_WCDMA_1700;
+					break;
+				} else if (!strcmp(argv[1], "add_wcdma_1800")) {
+					change_bands = BANDS_ADD_WCDMA_1800;
+					break;
 				}
 			}
 
 			fprintf(stderr, "Syntax: %s [lock|bands]\n\n", argv[0]);
 			fprintf(stderr, "Possible value for bands:\n");
 			fprintf(stderr, "\txt897_bands\tdefault bands of XT897\n");
-			fprintf(stderr, "\txt897_p_gsm_bands\tXT897 with P_GSM\n");
 			fprintf(stderr, "\txt901_bands\tdefault bands of XT901\n");
 			fprintf(stderr, "\txt905_bands\tdefault bands of XT905\n");
 			fprintf(stderr, "\txt907_bands\tdefault bands of XT907\n");
@@ -300,7 +307,10 @@ int main(int argc, char **argv)
 			fprintf(stderr, "\txt926_bands\tdefault bands of XT926\n");
 			fprintf(stderr, "\tmb886_bands\tdefault bands of MB886\n");
 			fprintf(stderr, "\tall_bands\tbands of all phones\n");
-			fprintf(stderr, "\textra_bands\tlike all_bands plus WCDMA1800\n");
+			fprintf(stderr, "\tadd_p_gsm\tAdd P_GSM to currently supported bands\n");
+			fprintf(stderr, "\tadd_wcdma_900\tAdd WCDMA900 to currently supported bands\n");
+			fprintf(stderr, "\tadd_wcdma_1700\tAdd WCDMA1700 to currently supported bands\n");
+			fprintf(stderr, "\tadd_wcdma_1800\tAdd WCDMA1800 to currently supported bands\n");
 			exit(EXIT_FAILURE);
 		} while(0);
 	}
@@ -405,11 +415,6 @@ int main(int argc, char **argv)
 		new_bands = 0;
 
 		switch (change_bands) {
-			case BANDS_EXTRA:
-				printf("Enabling WCDMA 1800 and ");
-				new_bands |= ((uint64_t)1 << 24); /* WCDMA 1800 */
-				//new_bands |= ((uint64_t)1 << 25); /* WCDMA 1700 */
-				//new_bands |= ((uint64_t)1 << 48); /* Europe 2600 */
 			case BANDS_ALL_PHONES:
 				printf("Enabling bands of XT897, XT905, XT907, XT925 and XT926:\n");
 				new_bands |= DEFAULT_BANDS_XT897;
@@ -423,11 +428,6 @@ int main(int argc, char **argv)
 			case BANDS_XT897:
 				printf("Resetting to default Photon Q bands:\n");
 				new_bands = DEFAULT_BANDS_XT897; /* default on XT897 */
-				break;
-			case BANDS_XT897_P_GSM:
-				printf("Setting to default Photon Q bands and primary GSM:\n");
-				new_bands = DEFAULT_BANDS_XT897; /* default on XT897 */
-				new_bands |= (1 << 9);
 				break;
 			case BANDS_XT901:
 				printf("Resetting to default Electrify M bands:\n");
@@ -452,6 +452,23 @@ int main(int argc, char **argv)
 			case BANDS_MB886:
 				printf("Resetting to default Atrix HD bands:\n");
 				new_bands = DEFAULT_BANDS_MB886; /* default on MB886 */
+				break;
+			case BANDS_ADD_P_GSM:
+				printf("Adding primary GSM:\n");
+				new_bands = bands | (1 << 9);
+				break;
+			case BANDS_ADD_WCDMA_900:
+				printf("Adding WCDMA 900:\n");
+				new_bands = bands | ((uint64_t)1 << 49); /* WCDMA 900 */
+				break;
+			case BANDS_ADD_WCDMA_1700:
+				printf("Adding WCDMA 1700:\n");
+				new_bands = bands | ((uint64_t)1 << 25); /* WCDMA 1700 */
+				break;
+			case BANDS_ADD_WCDMA_1800:
+				printf("Adding WCDMA 1800:\n");
+				new_bands = bands | ((uint64_t)1 << 24); /* WCDMA 1800 */
+				//new_bands |= ((uint64_t)1 << 48); /* Europe 2600 */
 				break;
 		}
 
