@@ -37,13 +37,13 @@
 #define DEFAULT_BANDS_XT926	(0x02000004e80187)
 #define DEFAULT_BANDS_MB886	(0x02000086e80587)
 
-#define DEFAULT_LTE_BANDS_XT897	(0x00000001)	//LTE 1900
-#define DEFAULT_LTE_BANDS_XT901	(0x1a080000)	//LTE 700 MHz Class 17 / 1700 / 2100
-#define DEFAULT_LTE_BANDS_XT905	(0x44000000)	//LTE 1800 / 2600
-#define DEFAULT_LTE_BANDS_XT907	(0x00100000)	//LTE 700 MHz Class 13
-#define DEFAULT_LTE_BANDS_XT925	(0x44000800)	//LTE 800 / 1800 / 2600
-#define DEFAULT_LTE_BANDS_XT926	(0x00100000)	//LTE 700 MHz Class 13
-#define DEFAULT_LTE_BANDS_MB886	(0x1a000100)	//LTE 700 MHz Class 17 / 2100
+#define DEFAULT_LTE_BANDS_XT897	(0x01000000)	//LTE 1900 (25)
+#define DEFAULT_LTE_BANDS_XT901	(0x0000081a)	//LTE 700 MHz Class 17 / 1700? / 2100 (2,4,5,12)
+#define DEFAULT_LTE_BANDS_XT905	(0x00000044)	//LTE 1800 / 2600 (3,7)
+#define DEFAULT_LTE_BANDS_XT907	(0x00001000)	//LTE 700 MHz Class 13 (13)
+#define DEFAULT_LTE_BANDS_XT925	(0x00080044)	//LTE 800 / 1800 / 2600 (3,7,20)
+#define DEFAULT_LTE_BANDS_XT926	(0x00001000)	//LTE 700 MHz Class 13 (13)
+#define DEFAULT_LTE_BANDS_MB886	(0x0001001a)	//LTE 700 MHz Class 17 / 2100 (2,4,5,17)
 
 enum bands {
 	BANDS_NO_CHANGE,
@@ -139,14 +139,112 @@ void show_bands(uint64_t bands)
 
 void show_lte_bands(uint32_t bands)
 {
+	int i;
+
 	printf("LTE Bands enabled by 0x%08x:\n", bands);
 
-	/* Guessed from defaults of different devices */
-	if (bands & ((uint32_t)1 << 0) <<  0) printf("1900 MHz\n");
-	if (bands & ((uint32_t)1 << 3) <<  8) printf("800 MHz\n");
-	if (bands & ((uint32_t)1 << 4) << 16) printf("700 MHz\n");
-	if (bands & ((uint32_t)1 << 2) << 24) printf("1800 or 2600 MHz\n");
-	if (bands & ((uint32_t)1 << 6) << 24) printf("1800 or 2600 MHz\n");
+	for (i = 0; i < 32; i++) {
+		if (bands & ((uint32_t)1 << i)) {
+			printf("%02d: ", i+1);
+			/* http://niviuk.free.fr/lte_band.php */
+			switch (i+1) {
+				case 1:
+					printf("2100");
+					break;
+				case 2:
+					printf("1900 PCS");
+					break;
+				case 3:
+					printf("1800 +");
+					break;
+				case 4:
+					printf("AWS 1");
+					break;
+				case 5:
+					printf("850 ");
+					break;
+				case 6:
+					printf("UMTS only");
+					break;
+				case 7:
+					printf("2600 ");
+					break;
+				case 8:
+					printf("900 ");
+					break;
+				case 9:
+					printf("1800 ");
+					break;
+				case 10:
+					printf("AWS 1+3");
+					break;
+				case 11:
+					printf("1500 Lower");
+					break;
+				case 12:
+					printf("700 ac ");
+					break;
+				case 13:
+					printf("700 c ");
+					break;
+				case 14:
+					printf("700 PS ");
+					break;
+				case 17:
+					printf("700 bc ");
+					break;
+				case 18:
+					printf("800 Lower");
+					break;
+				case 19:
+					printf("800 Upper");
+					break;
+				case 20:
+					printf("800 DD ");
+					break;
+				case 21:
+					printf("1500 Upper");
+					break;
+				case 22:
+					printf("3500 ");
+					break;
+				case 23:
+					printf("2000 S-band");
+					break;
+				case 24:
+					printf("1600 L-band");
+					break;
+				case 25:
+					printf("1900 + ");
+					break;
+				case 26:
+					printf("850 + ");
+					break;
+				case 27:
+					printf("800 SMR");
+					break;
+				case 28:
+					printf("700 APT");
+					break;
+				case 29:
+					printf("700 de ");
+					break;
+				case 30:
+					printf("2300 WCS");
+					break;
+				case 31:
+					printf("450 ");
+					break;
+				case 32:
+					printf("1500 L-band");
+					break;
+				default:
+					printf("?");
+					break;
+			}
+			printf("\n");
+		}
+	}
 
 	printf("\n");
 }
@@ -513,7 +611,7 @@ int main(int argc, char **argv)
 	}
 
 	lte_bands = 0;
-	for (i = 0; i < 4; i++) {
+	for (i = 3; i >= 0; i--) {
 		lte_bands <<= 8;
 		lte_bands |= data[3+i];
 	}
@@ -545,8 +643,8 @@ int main(int argc, char **argv)
 		data[1] = 0xAC;
 		data[2] = 0x1A;
 
-		for (i = 0; i < 4; i++) {
-			data[3+i] = (new_lte_bands >> ((3 - i) * 8)) & 0xff;
+		for (i = 3; i >= 0; i--) {
+			data[3+i] = (new_lte_bands >> (i * 8)) & 0xff;
 		}
 
 		len = sizeof(data);
