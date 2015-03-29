@@ -80,7 +80,7 @@ int logging_mode(int internal)
 	}
 
 	len = write(fd, mode, strlen(mode));
-	if (len != strlen(mode)) {
+	if (len != (int)strlen(mode)) {
 		perror("write");
 		return 0;
 	}
@@ -396,6 +396,7 @@ int main(int argc, char **argv)
 			}
 
 			fprintf(stderr, "Syntax: %s [lock|bands]\n\n", argv[0]);
+			fprintf(stderr, "\tlock\tlock operation on US GSM providers\n");
 			fprintf(stderr, "Possible value for bands:\n");
 			fprintf(stderr, "\txt897_bands\tdefault bands of XT897\n");
 			fprintf(stderr, "\txt901_bands\tdefault bands of XT901\n");
@@ -442,7 +443,7 @@ int main(int argc, char **argv)
 
 	/* GSM inside US */
 	printf("\n");
-	printf("Getting value of NV-item 8322...\n");
+	printf("Reading value of NV-item 8322...\n");
 
 	len = sizeof(data);
 	if (!diag_rw(fd, nv_get, sizeof(nv_get), data, &len)) {
@@ -454,7 +455,7 @@ int main(int argc, char **argv)
 		goto err;
 	}
 
-	printf("GSM outside USA only: %d\n", data[3]);
+	printf("GSM locked in the US: %d\n", data[3]);
 	if (data[3] == nv_set[3]) {
 		printf("No need to change anything!\n");
 	} else {
@@ -465,7 +466,7 @@ int main(int argc, char **argv)
 			goto err;
 		}
 
-		printf("Getting value of NV-item 8322...\n");
+		printf("Reading value of NV-item 8322...\n");
 
 		len = sizeof(data);
 		if (!diag_rw(fd, nv_get, sizeof(nv_get), data, &len)) {
@@ -477,16 +478,16 @@ int main(int argc, char **argv)
 			goto err;
 		}
 
-		printf("GSM outside USA only: %d\n", data[3]);
+		printf("GSM locked in the US: %d\n", data[3]);
 		if (data[3] != nv_set[3]) {
-			printf("Couldn't change GSM-outside-USA-only-bit!\n");
+			printf("Couldn't change GSM-us-lock-bit!\n");
 			goto err;
 		}
 	}
 
 	/* Supported bands */
 	printf("\n");
-	printf("Getting value of NV-item 1877...\n");
+	printf("Reading value of NV-item 1877...\n");
 
 	nv_get[1] = 0x55;
 	nv_get[2] = 0x07;
@@ -595,7 +596,7 @@ int main(int argc, char **argv)
 
 	/* LTE */
 	printf("\n");
-	printf("Getting value of NV-item 6828...\n");
+	printf("Reading value of NV-item 6828...\n");
 
 	nv_get[1] = 0xAC;
 	nv_get[2] = 0x1A;
