@@ -37,6 +37,8 @@
 #define DEFAULT_BANDS_XT926	(0x02000004e80187)
 #define DEFAULT_BANDS_MB886	(0x02000086e80587)
 
+#define BANDS_ALL		(0xffffffffffffffff)
+
 #define DEFAULT_LTE_BANDS_XT897	(0x01000000)	//LTE 1900 (25)
 #define DEFAULT_LTE_BANDS_XT901	(0x0000081a)	//LTE 700 MHz Class 17 / 1700? / 2100 (2,4,5,12)
 #define DEFAULT_LTE_BANDS_XT905	(0x00000044)	//LTE 1800 / 2600 (3,7)
@@ -44,6 +46,8 @@
 #define DEFAULT_LTE_BANDS_XT925	(0x00080044)	//LTE 800 / 1800 / 2600 (3,7,20)
 #define DEFAULT_LTE_BANDS_XT926	(0x00001000)	//LTE 700 MHz Class 13 (13)
 #define DEFAULT_LTE_BANDS_MB886	(0x0001001a)	//LTE 700 MHz Class 17 / 2100 (2,4,5,17)
+
+#define LTE_BANDS_ALL		(0xffffffff)
 
 enum bands {
 	BANDS_NO_CHANGE,
@@ -59,6 +63,10 @@ enum bands {
 	BANDS_ADD_WCDMA_900,
 	BANDS_ADD_WCDMA_1700,
 	BANDS_ADD_WCDMA_1800,
+	BANDS_ADD_ONE,
+	BANDS_REMOVE_ONE,
+	BANDS_LTE_ADD_ONE,
+	BANDS_LTE_REMOVE_ONE,
 };
 
 int logging_mode(int internal)
@@ -90,9 +98,10 @@ int logging_mode(int internal)
 	return 1;
 }
 
-void show_bands(uint64_t bands)
+void show_bands(uint64_t bands, int noheader)
 {
-	printf("Bands enabled by 0x%016llx:\n", bands);
+	if (!noheader)
+		printf("Bands enabled by 0x%016llx:\n", bands);
 
 	if (bands & ((uint64_t)1 <<  0)) printf("00: CDMA-1: BC 0, A-System\n");
 	if (bands & ((uint64_t)1 <<  1)) printf("01: CDMA-1: BC 0, B-System\n");
@@ -132,16 +141,17 @@ void show_bands(uint64_t bands)
 	if (bands & ((uint64_t)1 << 57)) printf("57: CDMA-2: BC 17\n");
 	if (bands & ((uint64_t)1 << 58)) printf("58: CDMA-2: BC 18\n");
 	if (bands & ((uint64_t)1 << 59)) printf("59: CDMA-2: BC 19\n");
-	if (bands & ((uint64_t)1 << 61)) printf("50: WCDMA: XI  - 1500\n");
+	if (bands & ((uint64_t)1 << 61)) printf("61: WCDMA: XI  - 1500\n");
 
 	printf("\n");
 }
 
-void show_lte_bands(uint32_t bands)
+void show_lte_bands(uint32_t bands, int noheader)
 {
 	int i;
 
-	printf("LTE Bands enabled by 0x%08x:\n", bands);
+	if (!noheader)
+		printf("LTE Bands enabled by 0x%08x:\n", bands);
 
 	for (i = 0; i < 32; i++) {
 		if (bands & ((uint32_t)1 << i)) {
@@ -342,11 +352,11 @@ int main(int argc, char **argv)
 	int ret;
 	uint64_t bands;
 	int change_bands = BANDS_NO_CHANGE;
+	uint64_t user_band = 0;
 	uint64_t new_bands;
 	uint32_t lte_bands;
-#if 0
 	uint32_t new_lte_bands;
-#endif
+	char *endptr;
 	int i;
 
 	if (argc > 1) {
@@ -392,24 +402,68 @@ int main(int argc, char **argv)
 				} else if (!strcmp(argv[1], "add_wcdma_1800")) {
 					change_bands = BANDS_ADD_WCDMA_1800;
 					break;
+				} else if (!strcmp(argv[1], "band?")) {
+					show_bands(BANDS_ALL, 1);
+					exit(EXIT_SUCCESS);
+				} else if (!strncmp(argv[1], "band",4)) {
+					if (strlen(argv[1]) >= 6) {
+						i = strtoul(argv[1]+5, &endptr, 10);
+						if (*endptr == '\0' && i >= 0) {
+							user_band = 1 << i;
+							switch (*(argv[1]+4)) {
+								case '+':
+									change_bands = BANDS_ADD_ONE;
+									break;
+								case '-':
+									change_bands = BANDS_REMOVE_ONE;
+									break;
+							}
+						}
+						break;
+					}
+				} else if (!strcmp(argv[1], "lte?")) {
+					show_lte_bands(LTE_BANDS_ALL, 1);
+					exit(EXIT_SUCCESS);
+				} else if (!strncmp(argv[1], "lte",3)) {
+					if (strlen(argv[1]) >= 5) {
+						i = strtoul(argv[1]+4, &endptr, 10);
+						if (*endptr == '\0' && i > 0) {
+							user_band = 1 << (i-1);
+							switch (*(argv[1]+3)) {
+								case '+':
+									change_bands = BANDS_LTE_ADD_ONE;
+									break;
+								case '-':
+									change_bands = BANDS_LTE_REMOVE_ONE;
+									break;
+							}
+						}
+						break;
+					}
 				}
 			}
 
 			fprintf(stderr, "Syntax: %s [lock|bands]\n\n", argv[0]);
 			fprintf(stderr, "\tlock\tlock operation on US GSM providers\n");
 			fprintf(stderr, "Possible value for bands:\n");
-			fprintf(stderr, "\txt897_bands\tdefault bands of XT897\n");
-			fprintf(stderr, "\txt901_bands\tdefault bands of XT901\n");
-			fprintf(stderr, "\txt905_bands\tdefault bands of XT905\n");
-			fprintf(stderr, "\txt907_bands\tdefault bands of XT907\n");
-			fprintf(stderr, "\txt925_bands\tdefault bands of XT925\n");
-			fprintf(stderr, "\txt926_bands\tdefault bands of XT926\n");
-			fprintf(stderr, "\tmb886_bands\tdefault bands of MB886\n");
+			fprintf(stderr, "\txt897_bands\tdefault bands/lte-bands of XT897\n");
+			fprintf(stderr, "\txt901_bands\tdefault bands/lte-bands of XT901\n");
+			fprintf(stderr, "\txt905_bands\tdefault bands/lte-bands of XT905\n");
+			fprintf(stderr, "\txt907_bands\tdefault bands/lte-bands of XT907\n");
+			fprintf(stderr, "\txt925_bands\tdefault bands/lte-bands of XT925\n");
+			fprintf(stderr, "\txt926_bands\tdefault bands/lte-bands of XT926\n");
+			fprintf(stderr, "\tmb886_bands\tdefault bands/lte-bands of MB886\n");
 			fprintf(stderr, "\tall_bands\tbands of all phones\n");
 			fprintf(stderr, "\tadd_p_gsm\tAdd P_GSM to currently supported bands\n");
 			fprintf(stderr, "\tadd_wcdma_900\tAdd WCDMA900 to currently supported bands\n");
 			fprintf(stderr, "\tadd_wcdma_1700\tAdd WCDMA1700 to currently supported bands\n");
 			fprintf(stderr, "\tadd_wcdma_1800\tAdd WCDMA1800 to currently supported bands\n");
+			fprintf(stderr, "\tband?\tShow possible bands\n");
+			fprintf(stderr, "\tband+X\tAdd band X to supported bands\n");
+			fprintf(stderr, "\tband-X\tRemove band X from supported bands\n");
+			fprintf(stderr, "\tlte?\tShow possible LTE bands\n");
+			fprintf(stderr, "\tlte+X\tAdd LTE band X to supported LTE bands\n");
+			fprintf(stderr, "\tlte-X\tRemove LTE band X from supported LTE bands\n");
 			exit(EXIT_FAILURE);
 		} while(0);
 	}
@@ -508,7 +562,7 @@ int main(int argc, char **argv)
 		bands |= data[3+i];
 	}
 
-	show_bands(bands);
+	show_bands(bands, 0);
 
 	if (change_bands != BANDS_NO_CHANGE) {
 		new_bands = 0;
@@ -569,13 +623,24 @@ int main(int argc, char **argv)
 				new_bands = bands | ((uint64_t)1 << 24); /* WCDMA 1800 */
 				//new_bands |= ((uint64_t)1 << 48); /* Europe 2600 */
 				break;
+			case BANDS_ADD_ONE:
+				new_bands = bands;
+				new_bands |= user_band;
+				break;
+			case BANDS_REMOVE_ONE:
+				new_bands = bands;
+				new_bands &= ~user_band;
+				break;
+			default:
+				new_bands = bands;
+				break;
 		}
 
 		if (bands == new_bands) {
 			printf("No need to change anything!\n");
 		} else {
 			printf("Setting value of NV-item 1877 to 0x%016llx (%llu)...\n", new_bands, new_bands);
-			show_bands(new_bands);
+			show_bands(new_bands, 0);
 
 			memcpy(data, nv_set, sizeof(nv_set));
 
@@ -617,44 +682,81 @@ int main(int argc, char **argv)
 		lte_bands |= data[3+i];
 	}
 
-	show_lte_bands(lte_bands);
+	show_lte_bands(lte_bands, 0);
 
 	printf("\n");
 
 	/* This also needs a modified/removed
-	 * /nv/item_files/modem/mmode/lte_bandpref in EFS.
+	 * /nv/item_files/modem/mmode/lte_bandpref in EFS on xt897.
 	 * After this the modem will crash as soon as it tries to
 	 * switch to a newly enabled frequency
 	 */
-#if 0
-	new_lte_bands = lte_bands;
-	new_lte_bands |= DEFAULT_LTE_BANDS_XT897; /* default on XT897, 1900MHz */
-	//new_lte_bands |= DEFAULT_LTE_BANDS_XT907; /* default on XT907, XT926, 700MHz? */
-	//new_lte_bands |= DEFAULT_LTE_BANDS_XT925; /* default on XT925 */
-	//new_lte_bands |= DEFAULT_LTE_BANDS_XT905; /* default on XT905 */
-
-	if (lte_bands == new_lte_bands) {
-		printf("No need to change anything!\n");
-	} else {
-		printf("Setting value of NV-item 6828 to 0x%06x (%u)...\n", new_lte_bands, new_lte_bands);
-		show_lte_bands(new_lte_bands);
-
-		memcpy(data, nv_set, sizeof(nv_set));
-
-		data[1] = 0xAC;
-		data[2] = 0x1A;
-
-		for (i = 3; i >= 0; i--) {
-			data[3+i] = (new_lte_bands >> (i * 8)) & 0xff;
+	if (change_bands != BANDS_NO_CHANGE) {
+		new_lte_bands = 0;
+		switch (change_bands) {
+			case BANDS_XT897:
+				printf("Resetting to default Photon Q LTE bands:\n");
+				new_lte_bands = DEFAULT_LTE_BANDS_XT897; /* default on XT897 */
+				break;
+			case BANDS_XT901:
+				printf("Resetting to default Electrify M LTE bands:\n");
+				new_lte_bands = DEFAULT_LTE_BANDS_XT901; /* default on XT901 */
+				break;
+			case BANDS_XT905:
+				printf("Resetting to default Razr M LTE bands:\n");
+				new_lte_bands = DEFAULT_LTE_BANDS_XT905; /* default on XT905 */
+				break;
+			case BANDS_XT907:
+				printf("Resetting to default Droid Razr M LTE bands:\n");
+				new_lte_bands = DEFAULT_LTE_BANDS_XT907; /* default on XT907 */
+				break;
+			case BANDS_XT925:
+				printf("Resetting to default Razr HD LTE bands:\n");
+				new_lte_bands = DEFAULT_LTE_BANDS_XT925; /* default on XT925 */
+				break;
+			case BANDS_XT926:
+				printf("Resetting to default Droid Razr HD LTE bands:\n");
+				new_lte_bands = DEFAULT_LTE_BANDS_XT926; /* default on XT926 */
+				break;
+			case BANDS_MB886:
+				printf("Resetting to default Atrix HD LTE bands:\n");
+				new_lte_bands = DEFAULT_LTE_BANDS_MB886; /* default on MB886 */
+				break;
+			case BANDS_LTE_ADD_ONE:
+				new_lte_bands = lte_bands;
+				new_lte_bands |= user_band;
+				break;
+			case BANDS_LTE_REMOVE_ONE:
+				new_lte_bands = lte_bands;
+				new_lte_bands &= ~user_band;
+				break;
+			default:
+				new_lte_bands = lte_bands;
+				break;
 		}
 
-		len = sizeof(data);
-		if (!diag_rw(fd, data, sizeof(nv_set), data, &len)) {
-			goto err;
+		if (lte_bands == new_lte_bands) {
+			printf("No need to change anything!\n");
+		} else {
+			printf("Setting value of NV-item 6828 to 0x%06x (%u)...\n", new_lte_bands, new_lte_bands);
+			show_lte_bands(new_lte_bands, 0);
+
+			memcpy(data, nv_set, sizeof(nv_set));
+
+			data[1] = 0xAC;
+			data[2] = 0x1A;
+
+			for (i = 3; i >= 0; i--) {
+				data[3+i] = (new_lte_bands >> (i * 8)) & 0xff;
+			}
+
+			len = sizeof(data);
+			if (!diag_rw(fd, data, sizeof(nv_set), data, &len)) {
+				goto err;
+			}
 		}
+		printf("\n");
 	}
-	printf("\n");
-#endif
 
 	close(fd);
 
