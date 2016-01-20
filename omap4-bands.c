@@ -33,15 +33,21 @@
 #include "nv.h"
 #include "bands.h"
 
+#define DEFAULT_BANDS_XT875_GSM	(0x00000004e80387) /* This is actually from the modem image! */
+#define DEFAULT_BANDS_XT875	(0x00000000000007)
 #define DEFAULT_BANDS_XT894	(0x02000004e80387)
 #define DEFAULT_BANDS_XT910	(0x02000004e80180)
+#define DEFAULT_BANDS_XT912	(0x02000004e80387)
 
 #define BANDS_ALL		(0xffffffffffffffff)
 
 enum bands {
 	BANDS_NO_CHANGE,
+	BANDS_XT875,
+	BANDS_XT875_GSM,
 	BANDS_XT897,
 	BANDS_XT910,
+	BANDS_XT912,
 	BANDS_ALL_PHONES,
 	BANDS_ADD_ONE,
 	BANDS_REMOVE_ONE,
@@ -68,11 +74,20 @@ int main(int argc, char **argv)
 				if (!strcmp(argv[1], "all_bands")) {
 					change_bands = BANDS_ALL_PHONES;
 					break;
+				} else if (!strcmp(argv[1], "xt875_bands")) {
+					change_bands = BANDS_XT875;
+					break;
+				} else if (!strcmp(argv[1], "xt875_gsm_bands")) {
+					change_bands = BANDS_XT875_GSM;
+					break;
 				} else if (!strcmp(argv[1], "xt894_bands")) {
 					change_bands = BANDS_XT897;
 					break;
 				} else if (!strcmp(argv[1], "xt910_bands")) {
 					change_bands = BANDS_XT910;
+					break;
+				} else if (!strcmp(argv[1], "xt912_bands")) {
+					change_bands = BANDS_XT912;
 					break;
 				} else if (!strcmp(argv[1], "band?")) {
 					show_bands(BANDS_ALL, 1);
@@ -81,7 +96,7 @@ int main(int argc, char **argv)
 					if (strlen(argv[1]) >= 6) {
 						i = strtoul(argv[1]+5, &endptr, 10);
 						if (*endptr == '\0' && i >= 0) {
-							user_band = 1 << i;
+							user_band = (uint64_t)1 << i;
 							switch (*(argv[1]+4)) {
 								case '+':
 									change_bands = BANDS_ADD_ONE;
@@ -98,7 +113,11 @@ int main(int argc, char **argv)
 
 			fprintf(stderr, "Syntax: %s [lock|bands]\n\n", argv[0]);
 			fprintf(stderr, "Possible value for bands:\n");
-			fprintf(stderr, "\txt894_bands\tdefault bands/lte-bands of XT894\n");
+			fprintf(stderr, "\txt875_bands\tdefault bands of XT875\n");
+			fprintf(stderr, "\txt875_gsm_bands\tdefault and GSM bands for XT875 (from firmware)\n");
+			fprintf(stderr, "\txt894_bands\tdefault bands of XT894\n");
+			fprintf(stderr, "\txt910_bands\tdefault bands of XT910\n");
+			fprintf(stderr, "\txt912_bands\tdefault bands of XT912\n");
 			fprintf(stderr, "\tall_bands\tbands of all phones\n");
 			fprintf(stderr, "\tband?\tShow possible bands\n");
 			fprintf(stderr, "\tband+X\tAdd band X to supported bands\n");
@@ -167,7 +186,18 @@ int main(int argc, char **argv)
 		switch (change_bands) {
 			case BANDS_ALL_PHONES:
 				printf("Enabling bands of XT894:\n");
+				new_bands |= DEFAULT_BANDS_XT875;
 				new_bands |= DEFAULT_BANDS_XT894;
+				new_bands |= DEFAULT_BANDS_XT910;
+				new_bands |= DEFAULT_BANDS_XT912;
+				break;
+			case BANDS_XT875:
+				printf("Resetting to default Droid Bionic bands:\n");
+				new_bands = DEFAULT_BANDS_XT875;
+				break;
+			case BANDS_XT875_GSM:
+				printf("Resetting to default/GSM Droid Bionic bands:\n");
+				new_bands = DEFAULT_BANDS_XT875_GSM;
 				break;
 			case BANDS_XT897:
 				printf("Resetting to default Droid 4 bands:\n");
@@ -176,6 +206,10 @@ int main(int argc, char **argv)
 			case BANDS_XT910:
 				printf("Resetting to default Razr bands:\n");
 				new_bands = DEFAULT_BANDS_XT910;
+				break;
+			case BANDS_XT912:
+				printf("Resetting to default Droid Razr bands:\n");
+				new_bands = DEFAULT_BANDS_XT912;
 				break;
 			case BANDS_ADD_ONE:
 				new_bands = bands;
