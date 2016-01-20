@@ -1,6 +1,6 @@
-/* Allow usage of US GSM-providers on Motorola Photon Q by setting RF NV 8322 to 0
+/* Change bands of Motorola Omap4 phones
  *
- * Copyright (c) 2014 Michael Gernoth <michael@gernoth.net>
+ * Copyright (c) 2016 Michael Gernoth <michael@gernoth.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
