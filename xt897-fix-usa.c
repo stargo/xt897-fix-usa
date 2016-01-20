@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 					if (strlen(argv[1]) >= 6) {
 						i = strtoul(argv[1]+5, &endptr, 10);
 						if (*endptr == '\0' && i >= 0) {
-							user_band = 1 << i;
+							user_band = (uint64_t)1 << i;
 							switch (*(argv[1]+4)) {
 								case '+':
 									change_bands = BANDS_ADD_ONE;
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
 					if (strlen(argv[1]) >= 5) {
 						i = strtoul(argv[1]+4, &endptr, 10);
 						if (*endptr == '\0' && i > 0) {
-							user_band = 1 << (i-1);
+							user_band = (uint64_t)1 << (i-1);
 							switch (*(argv[1]+3)) {
 								case '+':
 									change_bands = BANDS_LTE_ADD_ONE;
