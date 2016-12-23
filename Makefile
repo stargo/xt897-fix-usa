@@ -1,5 +1,5 @@
-CMROOT=/build/Android/cm-12.1
-CC=$(CMROOT)/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.8/bin/arm-linux-androideabi-gcc
+CMROOT=/build/Android/cm-13.0
+CC=$(CMROOT)/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-gcc
 CFLAGS=--sysroot $(CMROOT)/prebuilts/ndk/9/platforms/android-10/arch-arm/ -Wall
 LDFLAGS=-fPIE -fPIC -pie
 
