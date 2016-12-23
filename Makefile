@@ -14,6 +14,6 @@ run: xt897-fix-usa
 	adb shell /data/local/tmp/xt897-fix-usa
 
 clean:
-	rm -f xt897-fix-usa xt897-fix-usa.o
+	rm -f xt897-fix-usa xt897-fix-usa.o omap4-bands.o omap4-bands nv.o bands.o
 
 .PHONY: clean run
